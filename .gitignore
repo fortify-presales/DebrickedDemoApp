@@ -363,10 +363,24 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
-/IWAExpress.pdf
-*.fpr
-/.idea
+
+# Gradle/Maven
+build
+.gradle
+target
+
+# Debricked
+.debrickedTmpFolder
+.debricked.multiprojects.txt
+debricked-call-graph.java
+gradle.debricked.lock
+maven.debricked.lock
+.gradle-init-script.debricked.groovy
+
+# misc files
+.idea
+.vscode
 /email-db.json
 .env
-IWAExpress.zip
 fortify-sca.settings
+.dockerignore

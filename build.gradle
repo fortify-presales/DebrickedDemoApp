@@ -1,0 +1,125 @@
+plugins {
+    id 'java'
+    id 'war'
+    id 'maven-publish'
+    id "org.springframework.boot" version "2.1.8.RELEASE"
+//    id "com.github.node-gradle.node" version "7.0.2"
+}
+
+// NOTE: some of these versions are deliberately insecure for demonstration
+ext {
+    springBootVersion = '2.1.8.RELEASE'
+    springSecurityVersion = '3.0.4.RELEASE'
+    log4jVersion = '2.4.13'
+    jacksonVersion = '2.13.0'
+    junitVersion = '4.12'
+    junitJupiterVersion = '5.7.0'
+    junitPlatformVersion = '1.7.1'
+    mockitoVersion = '4.11.0'
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        url = uri('https://repo.maven.apache.org/maven2/')
+    }
+    processResources {
+        from('frontend/build') {
+            into 'public'
+        }
+    }
+}
+
+dependencies {
+    implementation "org.springframework.boot:spring-boot-starter-actuator:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-web:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-security:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-data-jdbc:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-log4j2:${log4jVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-jdbc:${springBootVersion}"
+    modules {
+        module("org.springframework.boot:spring-boot-starter-logging") {
+            replacedBy("org.springframework.boot:spring-boot-starter-log4j2", "Use Log4j2 instead of Logback")
+        }
+    }
+    implementation "org.springframework.boot:spring-boot-devtools:${springBootVersion}"
+    implementation "org.springframework.boot:spring-boot-starter-tomcat:${springBootVersion}"
+    implementation "org.springframework.security:spring-security-taglibs:5.2.8.RELEASE"
+    implementation "org.apache.tomcat.embed:tomcat-embed-jasper"
+    implementation 'javax.servlet:jstl:1.2'
+    implementation 'com.h2database:h2:1.4.197'
+    implementation 'org.webjars:lodash:4.17.4'
+    implementation 'org.owasp.encoder:encoder:1.2.3'
+    testImplementation "org.hibernate.validator:hibernate-validator:6.1.0.Final"
+    testImplementation("org.springframework.boot:spring-boot-starter-test:${springBootVersion}") {
+        exclude group: "com.vaadin.external.google", module:"android-json"
+    }
+    testImplementation "junit:junit:${junitVersion}"
+    testImplementation "org.junit.jupiter:junit-jupiter:${junitJupiterVersion}"
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${junitJupiterVersion}"
+    testImplementation "org.junit.jupiter:junit-jupiter-params:${junitJupiterVersion}"
+    testImplementation "org.junit.platform:junit-platform-engine:${junitPlatformVersion}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${junitJupiterVersion}"
+    testRuntimeOnly "org.junit.vintage:junit-vintage-engine:${junitJupiterVersion}"
+    testRuntimeOnly "org.junit.platform:junit-platform-commons:${junitPlatformVersion}"
+    testRuntimeOnly "org.codehaus.groovy:groovy:3.0.8"
+}
+
+apply plugin: 'io.spring.dependency-management'
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+    exclude module: 'spring-boot-starter-logging'
+}
+
+def props = new Properties()
+def propertiesFile = project.file('.env')
+if (!propertiesFile.exists()) {
+    props.setProperty('APP_NAME', 'DebrickedDemoApp')
+    props.setProperty('APP_VER_NAME', '1.0')
+    Writer writer = new FileWriter(propertiesFile, false)
+    props.store(writer, "Change these variables to relevant values. Don't commit this file to source control.")
+    writer.close()
+}
+props.load(propertiesFile.newDataInputStream())
+
+project.archivesBaseName = 'DebrickedDemoApp'
+group = 'com.opentext.app'
+version = '1.0'
+description = 'Insecure Web application for use in Debricked demonstrations'
+sourceCompatibility = '1.8'
+
+sourceSets {
+    main {
+        java.srcDirs = ['src/main/java']
+        resources.srcDirs= ['src/main/resources']
+    }
+    test {
+        java.srcDirs = ['src/test/java']
+	    resources.srcDirs = ['src/test/resources']
+    }
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from(components.java)
+        }
+    }
+}
+
+tasks.withType(JavaCompile) {
+    options.encoding = 'UTF-8'
+}
+
+test {
+    useJUnitPlatform()
+    reports {
+        junitXml.enabled = true
+        html.enabled = true
+    }
+}
+
+bootRun {
+    systemProperty "spring.profiles.active", "dev"
+}
