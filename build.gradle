@@ -3,7 +3,6 @@ plugins {
     id 'war'
     id 'maven-publish'
     id "org.springframework.boot" version "2.1.8.RELEASE"
-//    id "com.github.node-gradle.node" version "7.0.2"
 }
 
 // NOTE: some of these versions are deliberately insecure for demonstration
@@ -44,12 +43,9 @@ dependencies {
     }
     implementation "org.springframework.boot:spring-boot-devtools:${springBootVersion}"
     implementation "org.springframework.boot:spring-boot-starter-tomcat:${springBootVersion}"
-    implementation "org.springframework.security:spring-security-taglibs:5.2.8.RELEASE"
     implementation "org.apache.tomcat.embed:tomcat-embed-jasper"
     implementation 'javax.servlet:jstl:1.2'
     implementation 'com.h2database:h2:1.4.197'
-    implementation 'org.webjars:lodash:4.17.4'
-    implementation 'org.owasp.encoder:encoder:1.2.3'
     testImplementation "org.hibernate.validator:hibernate-validator:6.1.0.Final"
     testImplementation("org.springframework.boot:spring-boot-starter-test:${springBootVersion}") {
         exclude group: "com.vaadin.external.google", module:"android-json"
