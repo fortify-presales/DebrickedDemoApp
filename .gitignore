@@ -384,3 +384,4 @@ maven.debricked.lock
 .env
 fortify-sca.settings
 .dockerignore
+debricked.fingerprints.txt
