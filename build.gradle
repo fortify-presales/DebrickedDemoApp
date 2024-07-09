@@ -11,6 +11,7 @@ ext {
     springSecurityVersion = '3.0.4.RELEASE'
     log4jVersion = '2.4.13'
     jacksonVersion = '2.13.0'
+    itextVersion = '7.2.5'
     junitVersion = '4.12'
     junitJupiterVersion = '5.7.0'
     junitPlatformVersion = '1.7.1'
@@ -46,6 +47,7 @@ dependencies {
     implementation "org.apache.tomcat.embed:tomcat-embed-jasper"
     implementation 'javax.servlet:jstl:1.2'
     implementation 'com.h2database:h2:1.4.197'
+    implementation "com.itextpdf:itext7-core:${itextVersion}"
     testImplementation "org.hibernate.validator:hibernate-validator:6.1.0.Final"
     testImplementation("org.springframework.boot:spring-boot-starter-test:${springBootVersion}") {
         exclude group: "com.vaadin.external.google", module:"android-json"
