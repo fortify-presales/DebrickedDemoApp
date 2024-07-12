@@ -5,9 +5,10 @@
 name: OSS SCA with Debricked
 
 on:
-  # Triggers the workflow on push or pull request events but only for the main and dev branches
+  # Triggers the workflow on push or pull request events but only for the main and develop branches
   push:
     paths:
+      - '.github\**\*'
       - 'pom.xml'
       #- 'build.gradle'
       #- 'frontend/build.gradle'
