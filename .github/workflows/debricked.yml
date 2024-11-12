@@ -40,7 +40,11 @@ on:
       uploadToFoD:
         description: 'Upload Debricked results to FoD'
         required: false
-        default: 'true'
+        default: 'false'
+      uploadToSSC:
+        description: 'Upload Debricked results to SSC'
+        required: false
+        default: 'false'
 
 # Global environment variables
 env:
@@ -64,10 +68,10 @@ jobs:
           export-path: true
           fcli: latest
           debricked-cli: latest
+      # Note: we are excluding Gradle and using Maven so that we can use callgraph
       - name: Run debricked scan
         shell: bash
         run: |
-          # we are excluding Gradle and using Maven so we can callgraph works
           debricked scan --callgraph --prefer-npm -r "${DEFAULT_APP_NAME}" --access-token="${DEBRICKED_TOKEN}" -e "**/build.gradle" -e "**/node_modules/**" -e "*/**.lock" -e "**/build/classes/test/**" -e "**/target/classes/test-classes/**" .
         env:
           APP_NAME: ${{ env.DEFAULT_APP_NAME }}
@@ -76,7 +80,7 @@ jobs:
   Debricked-FoD-Import:
     runs-on: ubuntu-latest
     needs: [ Debricked-SCA ]
-    if: ${{ needs.Debricked-SCA.result == 'success' && ((github.event_name == 'push') || (github.event_name == 'pull_request') || (github.event.inputs.uploadToFoD == 'true')) }}
+    if: ${{ (github.event_name == 'push') || (github.event_name == 'pull_request') || (github.event.inputs.uploadToFoD == 'true') }}
     steps:
       - name: Setup Maven Action            
         uses: s4u/setup-maven-action@v1.16.0
