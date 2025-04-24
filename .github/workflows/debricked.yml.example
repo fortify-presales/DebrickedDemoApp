@@ -1,0 +1,59 @@
+
+# Create GitHub Action Secrets for your version of the application:
+#   DEBRICKEN_TOKEN should be an API Access Token from your Debricked tenant.
+#
+
+name: SCA with Debricked
+
+on:
+  # Triggers the workflow on push or pull request events but only for the main and develop branches
+  push:
+    paths:
+      - '.github\**\*'
+      - 'pom.xml'
+      #- 'build.gradle'
+      #- 'frontend/build.gradle'
+      - 'frontend/package.json'
+      - 'libs/**'
+    branches:
+      - '**'        # matches every branch
+  pull_request:
+    branches: [ main, develop ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      runDebrickedScan:
+        description: 'Carry out SCA scan using Debricked'
+        required: true
+        default: 'true'
+
+# Global environment variables
+env:
+  DEFAULT_APP_NAME: "DebrickedDemoApp"
+  
+jobs:
+
+  Debricked-SCA:
+    runs-on: ubuntu-latest
+    if: ${{ (github.event_name == 'push') || (github.event_name == 'pull_request') || (github.event.inputs.runDebrickedScan == 'true') }}
+    steps:
+      - name: Setup Maven Action            
+        uses: s4u/setup-maven-action@v1.16.0
+        with:
+          java-version: '17'
+          java-distribution: 'temurin'
+      - name: Setup Fortify tools
+        uses: fortify/github-action/setup@v1
+        with:
+          export-path: true
+          fcli: latest
+          debricked-cli: latest
+      # Note: we are excluding Gradle and using Maven so that we can use callgraph
+      - name: Run debricked scan
+        shell: bash
+        run: |
+          debricked scan --callgraph --prefer-npm -r "${DEFAULT_APP_NAME}" --access-token="${DEBRICKED_TOKEN}" -e "**/build.gradle" -e "**/node_modules/**" -e "*/**.lock" -e "**/build/classes/test/**" -e "**/target/classes/test-classes/**" .
+        env:
+          APP_NAME: ${{ env.DEFAULT_APP_NAME }}
+          DEBRICKED_TOKEN: ${{ secrets.DEBRICKED_TOKEN }}
